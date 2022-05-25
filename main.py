@@ -1,7 +1,23 @@
 import pyodbc
+import os
 from datetime import date
 
 today = date.today() #yyyy-mm-gg
+
+def testConnessione():
+    try:
+        conn = pyodbc.connect(connsrt)
+        print("Connessione riuscita!")
+        cmd = input("Continuare (y/n)? ")
+        cmd = cmd.lower()
+        if (cmd == 'y'):
+            cmd = ''
+        if (cmd == 'n'):
+            exit()
+    except pyodbc.Error as ex:
+        sqlstate = ex.args[1]
+        print("Non è possibile connettersi. Verificare i seguenti errori:")
+        print(sqlstate)
 
 def rename():
     print(connsrt)
@@ -57,19 +73,18 @@ while('test connessione' not in cmd or '1' not in cmd or 'test' not in cmd or 'r
     cmd = input()
     cmd = cmd.lower()
     if('test' in cmd or '1' in cmd):
-        try:
-            conn = pyodbc.connect(connsrt)
-            print("Connessione riuscita!")
-            cmd = input("Continuare (y/n)? ")
-            cmd = cmd.lower()
-            if (cmd == 'y'):
-                cmd = ''
-            if (cmd == 'n'):
+        sep = '\\'
+        host = server.split(sep, 1)[0]
+        response = os.system("ping "+ host)
+        if(response == 0):
+            print("L'host è attivo! Provo a connettermi all'istanza...")
+            testConnessione()
+        if(response != 0):
+            cmd = input("L'host non è raggiungibile, provare comunque a connettersi all'istanza (y/n)? ")
+            if(cmd == 'y'):
+                testConnessione()
+            if(cmd == 'n'):
                 exit()
-        except pyodbc.Error as ex:
-            sqlstate = ex.args[1]
-            print("Non è possibile connettersi. Verificare i seguenti errori:")
-            print(sqlstate)
     if('rinomina' in cmd or '2' in cmd): # Rinomina DB
         try:
             rename() # Richiama la funzione rename()
